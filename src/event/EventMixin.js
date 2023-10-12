@@ -134,7 +134,13 @@ var EventMixin = /** @lends EventMixin# */{
                 }
             }
 
-            if(eventListeners.length == 0) delete listeners[eventType];
+            /** phw-20231012: 
+             * 如果eventListeners仅有一个注册事件时，
+             * 在fire()中触事件A的过程中同时先后注销、注册事件A，
+             * 则会导致事件A测试失败。
+             * 所以这里应该使用原始的对象进行判断，以避免访bug的出现。
+             * */
+            if(this._listeners[eventType] && this._listeners[eventType].length == 0) delete this._listeners[eventType];
             return true;
         }
         return false;
